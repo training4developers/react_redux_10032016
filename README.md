@@ -1,4 +1,4 @@
-# Welcome to Intermediate GraphQL & Relay!
+# Welcome to React & Redux!
 
 ## Instructor
 
