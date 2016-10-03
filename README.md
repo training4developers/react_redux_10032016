@@ -70,31 +70,25 @@ $ npm i && npm start
 
 It will take a few minutes for this command to complete. If you have connection issues due to a proxy server, please edit the **.npmrc** file per the instructions in that file. Then re-run the command above.
 
-This set has been completed successfully when you receive the following message:
+This step has been completed successfully when you receive a message similar to this:
 
 ```bash
-web server running on port 3000
-please do not close this terminal window
-please use a new terminal window to run additional commands
+ Hash: 10ad47f06fa42cb3b7ee                                                                                               
+[1] Version: webpack 1.13.2                                                                                                  
+[1] Time: 1653ms                                                                                                             
+[1]      Asset       Size  Chunks             Chunk Names                                                                    
+[1]     app.js    1.89 MB       0  [emitted]  app                                                                            
+[1] index.html  217 bytes          [emitted]                                                                                 
+[1]     + 172 hidden modules                                                                                                 
+[1] Child html-webpack-plugin for "index.html":                                                                              
+[1]         + 3 hidden modules 
 ```
 
-This terminal window is now running the web server, a second terminal window will need to be opened to run additional terminal commands.
+This terminal window is now running the web server, REST server, and WebPack. A second terminal window will need to be opened to run additional terminal commands.
 
 Step 5. Open a web browser, and navigate to [http://localhost:3000](http://localhost:3000).  The starter web application should load and be usable.
 
-**To Modify the Web Application**
-
-Step 6. Open a new terminal window (do not use the same terminal window as the web server), change to the project folder.
-
-Step 7. From the terminal, run the following command:
-
-```bash
-$ npm run webpack
-```
-
-Note: This command will run, and then wait for file changes to process updated source code from the **src** folder. Webpack does **NOT** exit and return to a terminal prompt. Please do not close this terminal window.
-
-Step 8. Open your favorite text editor (such as [Atom](https://atom.io/) or [Visual Studio Code](https://code.visualstudio.com)), and modify the files in the **src/www** folder. When file changes are saved, **webpack** will automatically transpile and bundle the application code and assets, and deploy it to the **dist** folder. To see the changes, reload your web browser.
+Step 6. To modify the application, open your favorite text editor (such as [Atom](https://atom.io/) or [Visual Studio Code](https://code.visualstudio.com)), and modify the files in the **src/www** folder. When file changes are saved, **webpack** will automatically transpile and bundle the application code and assets, and deploy it to the **dist** folder. To see the changes, reload your web browser.
 
 Visual Studio Code supports JSX out of the box. Atom requires the **react** package to be installed. To install it from the menu bar, go to Packages -> Settings View -> Install Packages/Themes. Search for **react**, then click **Install** (you may need to scroll down the search results to find the package). Sometimes Atom will not be able to download the package because of proxy settings. To resolve this run the following commands from a terminal window, replacing the localhost URL with your proxy URL setting:
 

@@ -4,7 +4,7 @@
   "description": "Starter project for React & Redux",
   "main": "index.js",
   "scripts": {
-    "start": "npm run build && concurrently \"node index\" \"npm run rest\" \"npm run webpack\"",
+    "start": "npm run build && concurrently \"npm run rest\" \"npm run webpack\" \"node index\"",
     "postinstall": "npm run build",
     "clean": "rimraf dist",
     "build": "npm run clean && npm run server && npm run webpack-once",
