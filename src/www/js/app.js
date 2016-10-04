@@ -1,47 +1,81 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BaseComponent } from './components/base-component';
+import { ColorList } from './components/color-list';
+import { ColorForm } from './components/color-form';
+import { EventEmitter } from 'events';
 
-class ListOfColors extends React.Component {
+class Events
+
+class BrotherKidComponent extends React.Component {
+
+	constructor(props) {
+		super(props);
+
+		props.saveAll(this.saveAllClick);
+	}
+
+	saveAllClick() {
+		this.props.saveKid(this.state.newKid);
+	}
+
+
+}
+
+class BrotherComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			newColor: ''
+			kids: props.kids
 		};
 
-		this.onChange = this.onChange.bind(this);
+		this.saveAllHandlers = [];
 	}
 
-	onChange(e) {
-		this.setState({
-			[e.target.name]: e.target.value
-		});
+	saveAll() {
+		this.saveAllHandlers.forEach(fn => fn());
 	}
+
+	registerSaveAllHandler(fn) {
+		this.saveAllHandlers.push(fn);
+	}
+
+	saveKid() {
+
+	}
+
+	render() {
+		return <div><ul>
+			{this.state.kids.map(kid => <BrotherKidComponent kid={kid} saveAll={this.registerSaveAllHandler} save={this.saveKid} />)}
+		</ul>
+		<button click={this.saveAll}>Save All</button>
+		</div>;
+	}
+
+}
+
+class SisterComponent extends React.Component {
+
+	render() {
+		return <button click={this.saveAll}>Save All</button>;
+	}
+
+}
+
+
+class ParentComponent extends React.Component {
 
 	render() {
 
 		return <div>
-			<h1>List of Colors</h1>
-			<ul>
-				{this.props.colors.map(color => <li key={color}>{color}</li>)}
-			</ul>
-
-			<div>
-				<label htmlFor="new-color">New Color:</label>
-				<input type="text" id="new-color" name="newColor"
-					value={this.state.newColor} onChange={this.onChange} />
-			</div>
-
+			<BrotherComponent />
+			<SisterComponent />
 		</div>;
 	}
+
+
+
+
 }
-
-ListOfColors.propTypes = {
-	colors: React.PropTypes.array.isRequired
-};
-
-const colors = ['green','white','red','yellow','blue','orange','gold','saffron'];
-
-
-ReactDOM.render(<ListOfColors colors={colors} />, document.querySelector('main'));
