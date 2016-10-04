@@ -23,19 +23,15 @@ export class ColorForm extends BaseComponent {
 	componentDidMount() {
 
 		this.newColorInput.focus();
-		console.dir(this.newColorInput);
 
 	}
 
 	render() {
 
-		const labelText = '<b>New Color:</b>';
-
 		return <div>
-			<label htmlFor="new-color" dangerouslySetInnerHTML={({ __html: labelText })}></label>
+			<label htmlFor="new-color" dangerouslySetInnerHTML={({ __html: 'New Color:' })}></label>
 			<input type="text" id="new-color" name="newColor"
-				value={this.state.newColor} onChange={this.onChange}
-				ref={input => this.newColorInput = input} />
+				value={this.state.newColor} onChange={this.onChange} ref={c => this.newColorInput = c} />
 			<button type="button" onClick={this.onClick}>Add Color</button> 
 		</div>;
 	}

@@ -4,3 +4,11 @@ body {
 	font-size: 100%;
 	color:black;
 }
+
+input:invalid {
+	border: 2px solid red;
+}
+
+textarea {
+	vertical-align: middle;
+}
