@@ -1,4 +1,27 @@
 {
+  "cars": [
+    {
+      "id": 1,
+      "make": "Ford",
+      "model": "Fusion",
+      "color": "blue",
+      "year": 2003
+    },
+    {
+      "id": 2,
+      "make": "VW",
+      "model": "Fusion",
+      "color": "blue",
+      "year": 2003
+    },
+    {
+      "id": 3,
+      "make": "Toyota",
+      "model": "Fusion",
+      "color": "blue",
+      "year": 2003
+    }
+  ],
   "owners": [
     {
       "id": 1,
@@ -73,6 +96,22 @@
       "size": "a",
       "quantity": 5,
       "id": 7
+    },
+    {
+      "name": "New Widget",
+      "color": "red",
+      "size": "tiny",
+      "quantity": 2,
+      "description": "test",
+      "id": 8
+    },
+    {
+      "name": "New Widget",
+      "color": "red",
+      "size": "tiny",
+      "quantity": 2,
+      "description": "test",
+      "id": 9
     }
   ],
   "people": [
