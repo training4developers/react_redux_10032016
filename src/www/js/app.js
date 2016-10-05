@@ -1,124 +1,147 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { createStore, bindActionCreators } from 'redux';
-import keyMirror from 'key-mirror';
+import { createStore, combineReducers } from 'redux';
 
-const actionTypes = keyMirror({
-	ADD: null,
-	SUBTRACT: null
-});
+const cars = [
+	{ id: 1, make: 'Ford', model:'F-150', year:2016, color: 'red' },
+	{ id: 2, make: 'Ford', model:'F-250', year:2016, color: 'blue' }
+];
 
-const createAddAction = value => ({
-	type: actionTypes.ADD, value
-});
+let carLastId = 2;
 
-const createSubtractAction = value => ({
-	type: actionTypes.SUBTRACT, value
-});
+const addCarActionCreator = (car) => {
 
-const actionCreators = {
-	add: createAddAction,
-	subtract: createSubtractAction
+	return { type: 'addcar', car: Object.assign(car, { id: ++carLastId }) };
+
 };
 
-const reducer = (state = 0, action) => {
+const reducer = (state = { cars: [], sortField: '' }, action) => {
+
+	console.log(state);
 
 	switch(action.type) {
-		case actionTypes.ADD:
-			return state + action.value;
-		case actionTypes.SUBTRACT:
-			return state - action.value;
+		case 'addcar':
+			return Object.assign({}, state, { cars: state.cars.concat(action.car)});
+		case 'sortcars':
+			return Object.assign({}, state, { sortField: action.sortField });	
 		default:
 			return state;
 	}
 
 };
 
-const store = createStore(reducer);
-const actions = bindActionCreators(actionCreators, store.dispatch);
+class CarTable extends React.Component {
 
-store.subscribe(() => {
-	console.log(store.getState());
-});
+	render() {
 
-// store.dispatch(createAddAction(1));
-// store.dispatch(createSubtractAction(2));
-// store.dispatch(createAddAction(3));
+		return <table>
+			<thead>
+				<tr>
+					<th>Make</th>
+					<th>Model</th>
+					<th>Year</th>
+					<th>Color</th>
+				</tr>
+			</thead>
+			<tbody>
+				{this.props.cars.map(car => <tr key={car.id}>
+					<td>{car.make}</td>	
+					<td>{car.model}</td>	
+					<td>{car.year}</td>	
+					<td>{car.color}</td>	
+				</tr>)}
+			</tbody>
+		</table>;
 
-// actions.add(1);
-// actions.subtract(2);
-// actions.add(3);
+	}
 
-// class OutputValue extends React.Component {
-// 	render() {
-// 		return <span>Output: {this.props.outputValue}</span>;
-// 	}
-// }
+}
 
-const OutputValue = (props) => <span>Output: {props.outputValue}</span>;
-
-class Calculator extends React.Component {
+class CarForm extends React.Component {
 
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			outputValue: 0,
-			operand: 0
+			make: '',
+			model: '',
+			year: '',
+			color: ''
 		};
 
-		this.addValue = this.addValue.bind(this);
-		this.subtractValue = this.subtractValue.bind(this);
 		this.onChange = this.onChange.bind(this);
-	}
+		this.onClick = this.onClick.bind(this);
+	}	
 
 	onChange(e) {
 		this.setState({
-			operand: e.target.value ? parseInt(e.target.value, 10): ''
+			[e.target.name]: e.target.value
 		});
 	}
 
+	onClick() {
+		this.props.addCar(this.state);
+
+		this.setState({
+			make: '', model: '', year: '', color: ''
+		});
+	}
+
+	render() {
+
+		return <form>
+			Make: <input type="text" name="make" value={this.state.make} onChange={this.onChange} /><br />
+			Model: <input type="text" name="model" value={this.state.model} onChange={this.onChange} /><br />
+			Year: <input type="text" name="year" value={this.state.year} onChange={this.onChange} /><br />
+			Color: <input type="text" name="color" value={this.state.color} onChange={this.onChange} /><br />
+			<button type="button" onClick={this.onClick}>Add Car</button>
+		</form>;
+
+	}
+
+}
+
+const store = createStore(reducer, {
+	cars, sortField: ''
+});
+
+class CarApp extends React.Component {
+
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			cars: [],
+			sortField: ''
+		};
+
+		this.addCar = this.addCar.bind(this);
+	}
+
 	componentDidMount() {
-
 		this.storeUnsubscribe = this.props.store.subscribe(() => {
-
-			this.setState({
-				outputValue: this.props.store.getState()
-			});
-
+			this.setState(this.props.store.getState());
 		});
 
+		this.setState(this.props.store.getState());
 	}
 
 	componentWillUnmount() {
 		this.storeUnsubscribe();
 	}
 
-	addValue() {
-		this.props.actions.add(this.state.operand);
-	}
-
-	subtractValue() {
-		//this.props.store.dispatch({ type: 'SUBTRACT', value: this.state.operand });
-		this.props.actions.subtract(this.state.operand);
+	addCar(car) {
+		this.props.store.dispatch(addCarActionCreator(car));
 	}
 
 	render() {
-
 		return <div>
-			<form>
-				<button type="button" onClick={this.addValue}>Add</button>
-				<button type="button" onClick={this.subtractValue}>Subtract</button>
-				<input type="number" name="operand" id="operand"
-					value={this.state.operand} onChange={this.onChange} />
-			</form>
-			<OutputValue outputValue={this.state.outputValue} />
-		</div>;
-
+			<CarTable cars={this.state.cars} />
+			<CarForm addCar={this.addCar} />
+		</div>; 
 	}
 
-}
+} 
 
-ReactDOM.render(<Calculator store={store} actions={actions} />, document.querySelector('main'));
-
+ReactDOM.render(<CarApp store={store} />, document.querySelector('main'));
