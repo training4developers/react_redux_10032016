@@ -16,32 +16,66 @@ const addCarActionCreator = (car) => {
 
 };
 
-const reducer = (state = { cars: [], sortField: '' }, action) => {
+const carsReducer = (state = [], action) => {
 
-	console.log(state);
+	const sortCars = (carA, carB) => {
+		const sortField = action.sortField;
+		return carA[sortField] > carB[sortField];
+	};	
 
 	switch(action.type) {
 		case 'addcar':
-			return Object.assign({}, state, { cars: state.cars.concat(action.car)});
+			return state.concat(action.car).sort(sortCars);
 		case 'sortcars':
-			return Object.assign({}, state, { sortField: action.sortField });	
+			return state.concat().sort(sortCars);
+		default:
+			return state;
+	}
+};
+
+const sortReducer = (state = 'make', action) => {
+
+	switch(action.type) {
+		case 'sortcars':
+			return action.sortField;
 		default:
 			return state;
 	}
 
 };
 
+const store = createStore(combineReducers({
+	cars: carsReducer,
+	sortField: sortReducer
+}), {
+	cars, sortField: 'make'
+});
+
 class CarTable extends React.Component {
+
+	constructor(props) {
+		super(props);
+
+		//this.onSort = this.onSort.bind(this);
+	}
+
+	onSort = (e) => {
+		this.props.sortCars(e.target.getAttribute('data-sortfield'));
+	}
+
+	// onSort(e) {
+	// 	console.log(e.target.getAttribute('data-sortfield'));
+	// }
 
 	render() {
 
 		return <table>
 			<thead>
 				<tr>
-					<th>Make</th>
-					<th>Model</th>
-					<th>Year</th>
-					<th>Color</th>
+					<th data-sortfield='make' onClick={this.onSort}>Make</th>
+					<th data-sortfield='model' onClick={this.onSort}>Model</th>
+					<th data-sortfield='year' onClick={this.onSort}>Year</th>
+					<th data-sortfield='color' onClick={this.onSort}>Color</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -102,9 +136,7 @@ class CarForm extends React.Component {
 
 }
 
-const store = createStore(reducer, {
-	cars, sortField: ''
-});
+
 
 class CarApp extends React.Component {
 
@@ -135,9 +167,16 @@ class CarApp extends React.Component {
 		this.props.store.dispatch(addCarActionCreator(car));
 	}
 
+	sortCars = (sortField) => {
+		this.props.store.dispatch({
+			type: 'sortcars',
+			sortField
+		});
+	}
+
 	render() {
 		return <div>
-			<CarTable cars={this.state.cars} />
+			<CarTable sortCars={this.sortCars} cars={this.state.cars} />
 			<CarForm addCar={this.addCar} />
 		</div>; 
 	}
