@@ -1,18 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { createStore, combineReducers } from 'redux';
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
 
-const cars = [
-	{ id: 1, make: 'Ford', model:'F-150', year:2016, color: 'red' },
-	{ id: 2, make: 'Ford', model:'F-250', year:2016, color: 'blue' }
-];
 
-let carLastId = 2;
+const sortFieldExtract = ({ getState }) => {
 
-const addCarActionCreator = (car) => {
+	return (next) => {
 
-	return { type: 'addcar', car: Object.assign(car, { id: ++carLastId }) };
+		return (action) => {
+
+			action.sortField = action.sortField || getState().status.sortField;
+
+			return next(action);
+
+		};
+
+	};
 
 };
 
@@ -24,7 +29,11 @@ const carsReducer = (state = [], action) => {
 	};	
 
 	switch(action.type) {
-		case 'addcar':
+		case 'refresh_cars_request':
+			return [];
+		case 'refresh_cars_complete':
+			return action.cars.sort(sortCars);
+		case 'add_car_complete':
 			return state.concat(action.car).sort(sortCars);
 		case 'sortcars':
 			return state.concat().sort(sortCars);
@@ -33,23 +42,65 @@ const carsReducer = (state = [], action) => {
 	}
 };
 
-const sortReducer = (state = 'make', action) => {
+const statusReducer = (state = { sortField: 'make', status: 'loading' }, action) => {
 
 	switch(action.type) {
+		case 'refresh_cars_request':
+			return Object.assign({}, state, { status: 'requesting' });
+		case 'refresh_cars_complete':
+			return Object.assign({}, state, { status: 'complete' });
 		case 'sortcars':
-			return action.sortField;
+			return Object.assign({}, state, { sortField: action.sortField });
 		default:
 			return state;
 	}
 
 };
 
+const refreshCarsAction = () => {
+
+	return (dispatch) => {
+
+		dispatch({
+			type: 'refresh_cars_request'
+		});
+
+		return fetch('http://localhost:3010/cars')
+			.then(res => res.json())
+			.then(cars => dispatch({
+				type: 'refresh_cars_complete',
+				cars
+			}));
+	};
+
+};
+
+const addCarAction = (car) => {
+
+	return (dispatch) => {
+
+		dispatch({
+			type: 'add_car_request'
+		});
+
+		return fetch('http://localhost:3010/cars', {
+			method: 'POST',
+			headers: new Headers({ 'Content-Type': 'application/json' }),
+			body: JSON.stringify(car)
+		})
+			.then(res => res.json())
+			.then(car => dispatch({
+				type: 'add_car_complete',
+				car
+			}));
+	};
+
+};
+
 const store = createStore(combineReducers({
 	cars: carsReducer,
-	sortField: sortReducer
-}), {
-	cars, sortField: 'make'
-});
+	status: statusReducer
+}), applyMiddleware(sortFieldExtract, thunk));
 
 class CarTable extends React.Component {
 
@@ -145,7 +196,10 @@ class CarApp extends React.Component {
 
 		this.state = {
 			cars: [],
-			sortField: ''
+			status: {
+				sortField: 'make',
+				status: 'loading'
+			}
 		};
 
 		this.addCar = this.addCar.bind(this);
@@ -156,7 +210,8 @@ class CarApp extends React.Component {
 			this.setState(this.props.store.getState());
 		});
 
-		this.setState(this.props.store.getState());
+		//this.setState(this.props.store.getState());
+		this.props.store.dispatch(refreshCarsAction());
 	}
 
 	componentWillUnmount() {
@@ -164,7 +219,7 @@ class CarApp extends React.Component {
 	}
 
 	addCar(car) {
-		this.props.store.dispatch(addCarActionCreator(car));
+		this.props.store.dispatch(addCarAction(car));
 	}
 
 	sortCars = (sortField) => {
@@ -174,8 +229,13 @@ class CarApp extends React.Component {
 		});
 	}
 
+	onClick = () => {
+		this.props.store.dispatch(refreshCarsAction());
+	} 
+
 	render() {
 		return <div>
+			<button type="button" onClick={this.onClick}>Refresh</button>
 			<CarTable sortCars={this.sortCars} cars={this.state.cars} />
 			<CarForm addCar={this.addCar} />
 		</div>; 
