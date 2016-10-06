@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
+import { Provider, connect } from 'react-redux';
 
 
 const sortFieldExtract = ({ getState }) => {
@@ -191,56 +192,50 @@ class CarForm extends React.Component {
 
 class CarApp extends React.Component {
 
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			cars: [],
-			status: {
-				sortField: 'make',
-				status: 'loading'
-			}
-		};
-
-		this.addCar = this.addCar.bind(this);
-	}
-
 	componentDidMount() {
-		this.storeUnsubscribe = this.props.store.subscribe(() => {
-			this.setState(this.props.store.getState());
-		});
-
-		//this.setState(this.props.store.getState());
-		this.props.store.dispatch(refreshCarsAction());
+		this.props.refreshCars();
 	}
-
-	componentWillUnmount() {
-		this.storeUnsubscribe();
-	}
-
-	addCar(car) {
-		this.props.store.dispatch(addCarAction(car));
-	}
-
-	sortCars = (sortField) => {
-		this.props.store.dispatch({
-			type: 'sortcars',
-			sortField
-		});
-	}
-
-	onClick = () => {
-		this.props.store.dispatch(refreshCarsAction());
-	} 
 
 	render() {
 		return <div>
-			<button type="button" onClick={this.onClick}>Refresh</button>
-			<CarTable sortCars={this.sortCars} cars={this.state.cars} />
-			<CarForm addCar={this.addCar} />
+			<button type="button" onClick={this.props.refreshCars}>Refresh</button>
+			<CarTable sortCars={this.props.sortCars} cars={this.props.cars} />
+			<CarForm addCar={this.props.addCar} />
 		</div>; 
 	}
 
 } 
 
-ReactDOM.render(<CarApp store={store} />, document.querySelector('main'));
+const mapStateToProps = (state, ownProps) => {
+
+	return {
+		cars: state.cars,
+		status: state.status
+	};
+
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+
+	return {
+		refreshCars: () => {
+			dispatch(refreshCarsAction());
+		},
+		addCar: (car) => {
+			dispatch(addCarAction(car));
+		},
+		sortCars: (sortField) => {
+			dispatch({
+				type: 'sortcars',
+				sortField
+			});
+		}
+	};
+
+};
+
+const CarAppContainer = connect(mapStateToProps, mapDispatchToProps)(CarApp);
+
+ReactDOM.render(<Provider store={store}>
+	<CarAppContainer />
+</Provider>, document.querySelector('main'));

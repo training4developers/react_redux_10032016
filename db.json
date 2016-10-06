@@ -11,15 +11,36 @@
       "id": 2,
       "make": "VW",
       "model": "Fusion",
-      "color": "blue",
-      "year": 2003
+      "color": "orange",
+      "year": 2005
     },
     {
       "id": 3,
       "make": "Toyota",
       "model": "Fusion",
-      "color": "blue",
-      "year": 2003
+      "color": "red",
+      "year": 2002
+    },
+    {
+      "make": "a",
+      "model": "a",
+      "year": "a",
+      "color": "a",
+      "id": 4
+    },
+    {
+      "make": "a",
+      "model": "a",
+      "year": "a",
+      "color": "a",
+      "id": 5
+    },
+    {
+      "make": "a",
+      "model": "a",
+      "year": 2017,
+      "color": "a",
+      "id": 6
     }
   ],
   "owners": [
